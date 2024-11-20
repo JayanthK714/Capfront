@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Image Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <style>
+      .imageCont img {
+        width: 100%;
+        border-radius: 10px;
+      }
+      .svgContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body class="bg-[#19103b] text-white min-h-screen">
+    <!-- Navbar -->
+    <header class="flex justify-between items-center p-4">
+      <div class="flex items-center space-x-2">
+        <img
+          src="https://placehold.co/40x40"
+          alt="DeepAI logo"
+          class="w-8 h-8"
+        />
+        <span class="text-lg font-semibold">GenAI</span>
+      </div>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#" class="hover:underline">Home</a>
+        <a href="#" class="hover:underline">About Us</a>
+        <a href="#" class="hover:underline">AI Tools</a>
+        <a href="#" class="hover:underline">Login</a>
+      </nav>
+      <button class="md:hidden">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-10 max-w-2xl text-center">
+      <h1 class="text-4xl font-bold">AI Image Generator</h1>
+      <p class="mt-4 text-lg">
+        Enter a description and generate an image using AI!
+      </p>
+
+      <!-- Input Section -->
+      <div class="mt-10 w-full max-w-2xl bg-[#221344] p-6 rounded-lg">
+        <label for="imgprompt" class="block mb-2 text-lg">
+          Enter your prompt
+        </label>
+        <input
+          id="imgprompt"
+          type="text"
+          class="w-full p-4 text-lg bg-[#2c1a56] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          placeholder="Enter your image prompt"
+        />
+        <div class="text-sm text-gray-400 mt-2">
+          Enter a description and we'll generate the image for you!
+        </div>
+        <button id="submitbtn" type="submit" class="mt-4 px-6 py-3 bg-purple-600 text-white rounded-full hover:bg-purple-700">
+          Generate Image
+        </button>
+      </div>
+
+      <!-- Loading GIF -->
+      <div class="svgContainer my-8">
+        <svg
+          class="d-none" id="loadingGif" xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink" style="margin:auto;background:#fff"
+          width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+          <g transform="rotate(0 50 50)">
+            <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#000000">
+              <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s"
+                begin="-0.9166666666666666s" repeatCount="indefinite"></animate>
+            </rect>
+          </g>
+        </svg>
+        <div class="container mx-auto imageCont grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Generated images will be injected here -->
+          <div class="imageCont">
+            <img id="imageDisplay" src="" alt="Generated Image" class="img-fluid rounded-lg" />
+        </div>
+
+      </div>
+
+      <!-- Images Display Section -->
+      
+      
+      </div>
+    </div>
+
+    <!-- Script for Fetching and Displaying Images -->
+    <script>
+      const submitBtn = document.getElementById("submitbtn");
+      //const loadingGif = document.getElementById("loadingGif");
+      const imgPrompt = document.getElementById("imgprompt");
+
+      submitBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      loadingGif.classList.toggle("d-none");
+
+      const promptTxt = imgPrompt.value;  // Corrected to imgPrompt instead of submitBtn
+
+      fetch("http://localhost:5000/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ description: promptTxt, num_samples: 5 })
+      })
+      .then(response => response.blob())
+      .then(imageBlob => {
+        console.log(imageBlob);
+        loadingGif.classList.toggle("d-none");
+    const imageUrl = URL.createObjectURL(imageBlob);
+    document.getElementById('imageDisplay').src = imageUrl;  // Display the image
+})
+.catch(error => console.error('Error:', error));
+      // // .then(data => {
+      // //   loadingGif.classList.toggle("d-none");
+
+      // //   const images = data.data;
+      // //   const container = document.querySelector(".imageCont");
+      // //   let totalHtml = "";
+
+      // //   images.forEach(image => {
+      // //     let html = `
+      // //       <div class="col-md-4 my-2">
+      // //         <img src="${image.url}" alt="Generated Image" class="img-fluid rounded-lg">
+      // //       </div>`;
+      // //     totalHtml += html;
+      // //   });
+
+      //   container.innerHTML = totalHtml;
+      //});
+    });
+
+    </script>
+  </body>
+</html>
+
